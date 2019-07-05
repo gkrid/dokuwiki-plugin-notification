@@ -9,5 +9,5 @@
 // $lang['menu'] = 'Your menu entry';
 
 // custom language strings for the plugin
-$lang['no notifications'] = 'No notifications';
+$lang['no notifications'] = 'Brak powiadomień';
 
