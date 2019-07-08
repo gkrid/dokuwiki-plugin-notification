@@ -36,8 +36,9 @@ class syntax_plugin_notification_list extends DokuWiki_Syntax_Plugin
 
         $params = [
             'plugin' => '.*',
+            'user' => '$USER$',
             'full' => true,
-            'date' => 'Y-m-d'
+            'date' => '%Y-%m-%d'
         ];
         foreach ($lines as $line) {
             $pair = explode(':', $line, 2);
@@ -104,12 +105,15 @@ class syntax_plugin_notification_list extends DokuWiki_Syntax_Plugin
         $plugin_name = $this->getPluginName();
 
         $plugins = $this->getNotificationPlugins($data['plugin']);
-        $old_plugins = $renderer->meta['plugin'][$plugin_name];
+        $old_plugins = $renderer->meta['plugin'][$plugin_name]['plugins'];
         if (!$old_plugins) {
             $old_plugins = [];
         }
 
-        $renderer->meta['plugin'][$plugin_name] = array_unique(array_merge($plugins, $old_plugins));
+        $renderer->meta['plugin'][$plugin_name]['plugins'] = array_unique(array_merge($plugins, $old_plugins));
+        if ($data['user'] == '$USER$') {
+            $renderer->meta['plugin'][$plugin_name]['dynamic user'] = true;
+        }
     }
 
     /**
@@ -124,9 +128,13 @@ class syntax_plugin_notification_list extends DokuWiki_Syntax_Plugin
 
         $plugins = $this->getNotificationPlugins($data['plugin']);
 
+        if ($data['user'] == '$USER$') {
+            $data['user'] = $INFO['client'];
+        }
+
         $notifications_data = [
             'plugins' => $plugins,
-            'user' => $INFO['client'],
+            'user' => $data['user'],
             'notifications' => []
         ];
         trigger_event('PLUGIN_NOTIFICATION_GATHER', $notifications_data);

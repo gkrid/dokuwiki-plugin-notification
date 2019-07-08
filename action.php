@@ -36,7 +36,7 @@ class action_plugin_notification extends DokuWiki_Action_Plugin
      */
     public function handle_parser_cache_use(Doku_Event $event, $param)
     {
-        /** @var cache_parser $cache */
+        /** @var cache_renderer $cache */
         $cache = $event->data;
 
         if(!$cache->page) return;
@@ -44,11 +44,16 @@ class action_plugin_notification extends DokuWiki_Action_Plugin
         if($cache->mode != 'xhtml') return;
 
         //Check if it is plugins
-        $plugins = p_get_metadata($cache->page, 'plugin notification');
-        if(!$plugins) return;
+        $notification = p_get_metadata($cache->page, 'plugin notification');
+        if(!$notification) return;
+
+        if ($notification['dynamic user']) {
+            $cache->_nocache = true;
+            return;
+        }
 
         $data = [
-            'plugins' => $plugins,
+            'plugins' => $notification['plugins'],
             'dependencies' => []
         ];
         trigger_event('PLUGIN_NOTIFICATION_CACHE_DEPENDENCIES', $data);
