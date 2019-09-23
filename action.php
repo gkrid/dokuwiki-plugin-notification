@@ -54,11 +54,13 @@ class action_plugin_notification extends DokuWiki_Action_Plugin
 
         $data = [
             'plugins' => $notification['plugins'],
-            'dependencies' => []
+            'dependencies' => [],
+            '_nocache' => false
         ];
         trigger_event('PLUGIN_NOTIFICATION_CACHE_DEPENDENCIES', $data);
 
         //add a media directories to dependencies
         $cache->depends['files'] = array_merge($cache->depends['files'], $data['dependencies']);
+        $cache->_nocache = $data['_nocache'];
     }
 }
