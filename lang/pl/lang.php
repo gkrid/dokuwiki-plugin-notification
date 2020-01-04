@@ -11,3 +11,5 @@
 // custom language strings for the plugin
 $lang['no notifications'] = 'Brak powiadomień';
 
+$lang['mail subject'] = 'Powiadomienia';
+$lang['mail content'] = 'Masz następujące nowe powiadomienia:';

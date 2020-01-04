@@ -11,7 +11,7 @@ if (!defined('DOKU_INC')) {
     die();
 }
 
-class action_plugin_notification extends DokuWiki_Action_Plugin
+class action_plugin_notification_cache extends DokuWiki_Action_Plugin
 {
 
     /**
