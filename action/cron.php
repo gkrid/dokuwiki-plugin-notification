@@ -44,6 +44,11 @@ class action_plugin_notification_cron extends DokuWiki_Action_Plugin
         $db_helper = plugin_load('helper', 'notification_db');
         $sqlite = $db_helper->getDB();
 
+        // insert new users first
+        /** @var \helper_plugin_notification_cron $cron_helper */
+        $cron_helper = plugin_load('helper', 'notification_cron');
+        $cron_helper->addUsersToCron();
+
 
         //get the oldest check
         $res = $sqlite->query('SELECT user, MIN(timestamp) FROM cron_check');
