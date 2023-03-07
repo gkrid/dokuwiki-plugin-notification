@@ -10,4 +10,4 @@
 $lang['no notifications'] = 'Keine Benachrichtigungen';
 
 $lang['mail subject'] = 'Benachrichtigungen';
-$lang['mail content'] = 'Sie haben folgende neue Benachrichtigungen:';
+$lang['mail content'] = 'Du hast folgende neue Benachrichtigungen:';
