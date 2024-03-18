@@ -7,11 +7,6 @@
  * @author  Szymon Olewniczak <it@rid.pl>
  */
 
-// must be run within Dokuwiki
-if (!defined('DOKU_INC')) {
-    die();
-}
-
 class action_plugin_notification_cron extends DokuWiki_Action_Plugin
 {
 
