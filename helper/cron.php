@@ -176,7 +176,6 @@ class helper_plugin_notification_cron extends DokuWiki_Plugin
      */
     public function storeSentNotifications($user, $notifications)
     {
-        // FIXME refactor
         /** @var \helper_plugin_notification_db $db_helper */
         $db_helper = plugin_load('helper', 'notification_db');
         $sqlite = $db_helper->getDB();
