@@ -1,4 +1,9 @@
 <?php
+
+use dokuwiki\Extension\ActionPlugin;
+use dokuwiki\Extension\EventHandler;
+use dokuwiki\Extension\Event;
+
 /**
  * DokuWiki Plugin notification (Action Component)
  *
@@ -6,46 +11,40 @@
  * @author  Szymon Olewniczak <it@rid.pl>
  */
 
-// must be run within Dokuwiki
-if (!defined('DOKU_INC')) {
-    die();
-}
-
-class action_plugin_notification_cache extends DokuWiki_Action_Plugin
+class action_plugin_notification_cache extends ActionPlugin
 {
-
     /**
      * Registers a callback function for a given event
      *
-     * @param Doku_Event_Handler $controller DokuWiki's event controller object
+     * @param EventHandler $controller DokuWiki's event controller object
      *
      * @return void
      */
-    public function register(Doku_Event_Handler $controller)
+    public function register(EventHandler $controller)
     {
-        $controller->register_hook('PARSER_CACHE_USE', 'BEFORE', $this, 'handle_parser_cache_use');
+        $controller->register_hook('PARSER_CACHE_USE', 'BEFORE', $this, 'handleParserCacheUse');
     }
 
     /**
      *
-     * @param Doku_Event $event  event object by reference
+     * @param Event $event event object by reference
      * @param mixed      $param  [the parameters passed as fifth argument to register_hook() when this
      *                           handler was registered]
      *
      * @return void
      */
-    public function handle_parser_cache_use(Doku_Event $event, $param)
+    public function handleParserCacheUse(Event $event, $param)
     {
         /** @var cache_renderer $cache */
         $cache = $event->data;
 
-        if(!$cache->page) return;
+        if (!$cache->page) return;
         //purge only xhtml cache
-        if($cache->mode != 'xhtml') return;
+        if ($cache->mode != 'xhtml') return;
 
         //Check if it is plugins
         $notification = p_get_metadata($cache->page, 'plugin notification');
-        if(!$notification) return;
+        if (!$notification) return;
 
         if ($notification['dynamic user']) {
             $cache->_nocache = true;
@@ -57,7 +56,7 @@ class action_plugin_notification_cache extends DokuWiki_Action_Plugin
             'dependencies' => [],
             '_nocache' => false
         ];
-        trigger_event('PLUGIN_NOTIFICATION_CACHE_DEPENDENCIES', $data);
+        Event::createAndTrigger('PLUGIN_NOTIFICATION_CACHE_DEPENDENCIES', $data);
 
         //add a media directories to dependencies
         $cache->depends['files'] = array_merge($cache->depends['files'], $data['dependencies']);

@@ -1,35 +1,31 @@
 <?php
-/**
- * DokuWiki Plugin bez (Action Component)
- *
- */
 
-// must be run within Dokuwiki
-
-if (!defined('DOKU_INC')) die();
+use dokuwiki\Extension\ActionPlugin;
+use dokuwiki\Extension\EventHandler;
+use dokuwiki\Extension\Event;
 
 /**
- * Class action_plugin_bez_migration
+ * Class action_plugin_notification_migration
  *
  * Handle migrations that need more than just SQL
  */
-class action_plugin_notification_migration extends DokuWiki_Action_Plugin
+class action_plugin_notification_migration extends ActionPlugin
 {
     /**
      * @inheritDoc
      */
-    public function register(Doku_Event_Handler $controller)
+    public function register(EventHandler $controller)
     {
-        $controller->register_hook('PLUGIN_SQLITE_DATABASE_UPGRADE', 'AFTER', $this, 'handle_migrations');
+        $controller->register_hook('PLUGIN_SQLITE_DATABASE_UPGRADE', 'AFTER', $this, 'handleMigrations');
     }
 
     /**
      * Call our custom migrations when defined
      *
-     * @param Doku_Event $event
+     * @param Event $event
      * @param $param
      */
-    public function handle_migrations(Doku_Event $event, $param)
+    public function handleMigrations(Event $event, $param)
     {
         if ($event->data['sqlite']->getAdapter()->getDbname() !== 'notification') {
             return;
@@ -50,8 +46,10 @@ class action_plugin_notification_migration extends DokuWiki_Action_Plugin
         $sqlite = $db_helper->getDB();
 
         foreach (array_keys($auth->retrieveUsers()) as $user) {
-            $sqlite->storeEntry('cron_check',
-                ['user' => $user, 'timestamp' => date('c', 0)]);
+            $sqlite->storeEntry(
+                'cron_check',
+                ['user' => $user, 'timestamp' => date('c', 0)]
+            );
         }
     }
 }
