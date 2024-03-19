@@ -1,8 +1,10 @@
 <?php
 
+use dokuwiki\Extension\CLIPlugin;
+use splitbrain\phpcli\Exception;
 use splitbrain\phpcli\Options;
 
-class cli_plugin_notification extends DokuWiki_CLI_Plugin
+class cli_plugin_notification extends CLIPlugin
 {
     /** @var helper_plugin_notification_db */
     protected $db_helper;
@@ -25,7 +27,7 @@ class cli_plugin_notification extends DokuWiki_CLI_Plugin
      *
      * @param Options $options
      * @return void
-     * @throws \splitbrain\phpcli\Exception
+     * @throws Exception
      */
     protected function setup(Options $options)
     {
@@ -74,7 +76,7 @@ class cli_plugin_notification extends DokuWiki_CLI_Plugin
             $user = $row['user'];
 
             // update timestamp of cron check
-            $sqlite->query('UPDATE cron_check SET timestamp=? WHERE user=?',  date('c'), $user);
+            $sqlite->query('UPDATE cron_check SET timestamp=? WHERE user=?', date('c'), $user);
 
             $notification_data = $this->cron_helper->getNotificationData($user);
 

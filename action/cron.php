@@ -1,36 +1,38 @@
 <?php
 
+use dokuwiki\Extension\ActionPlugin;
+use dokuwiki\Extension\EventHandler;
+use dokuwiki\Extension\Event;
+
 /**
  * DokuWiki Plugin notification (Action Component)
  *
  * @license GPL 2 http://www.gnu.org/licenses/gpl-2.0.html
  * @author  Szymon Olewniczak <it@rid.pl>
  */
-
-class action_plugin_notification_cron extends DokuWiki_Action_Plugin
+class action_plugin_notification_cron extends ActionPlugin
 {
-
     /**
      * Registers a callback function for a given event
      *
-     * @param Doku_Event_Handler $controller DokuWiki's event controller object
+     * @param EventHandler $controller DokuWiki's event controller object
      *
      * @return void
      */
-    public function register(Doku_Event_Handler $controller)
+    public function register(EventHandler $controller)
     {
-        $controller->register_hook('INDEXER_TASKS_RUN', 'AFTER', $this, 'handle_indexer_tasks_run');
+        $controller->register_hook('INDEXER_TASKS_RUN', 'AFTER', $this, 'handleIndexerTasksRun');
     }
 
     /**
      *
-     * @param Doku_Event $event  event object by reference
+     * @param Event $event event object by reference
      * @param mixed      $param  [the parameters passed as fifth argument to register_hook() when this
      *                           handler was registered]
      *
      * @return void
      */
-    public function handle_indexer_tasks_run(Doku_Event $event, $param)
+    public function handleIndexerTasksRun(Event $event, $param)
     {
         /** @var DokuWiki_Auth_Plugin $auth */
         global $auth;
@@ -51,7 +53,7 @@ class action_plugin_notification_cron extends DokuWiki_Action_Plugin
         if (!$user) return;
 
         //update user last check
-        $sqlite->query('UPDATE cron_check SET timestamp=? WHERE user=?',  date('c'), $user);
+        $sqlite->query('UPDATE cron_check SET timestamp=? WHERE user=?', date('c'), $user);
 
         // get new notifications from plugins
         $notification_data = $cron_helper->getNotificationData($user);

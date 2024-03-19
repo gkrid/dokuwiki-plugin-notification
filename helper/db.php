@@ -1,13 +1,14 @@
 <?php
 
+use dokuwiki\Extension\Plugin;
+
 /**
  * DokuWiki Plugin notification (Helper Component)
  *
  * @license GPL 2 http://www.gnu.org/licenses/gpl-2.0.html
  * @author  Szymon Olewniczak <dokuwiki@cosmocode.de>
  */
-
-class helper_plugin_notification_db extends DokuWiki_Plugin
+class helper_plugin_notification_db extends Plugin
 {
     /** @var helper_plugin_sqlite */
     protected $sqlite;
@@ -27,7 +28,6 @@ class helper_plugin_notification_db extends DokuWiki_Plugin
      */
     protected function init()
     {
-        /** @var helper_plugin_sqlite $sqlite */
         $this->sqlite = plugin_load('helper', 'sqlite');
         if (!$this->sqlite) {
             if (defined('DOKU_UNITTEST')) {

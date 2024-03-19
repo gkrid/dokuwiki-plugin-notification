@@ -1,11 +1,14 @@
 <?php
+
+use dokuwiki\Extension\Plugin;
+use dokuwiki\Extension\Event;
+
 /**
- * DokuWiki Plugin watchcycle (Helper Component)
+ * DokuWiki Plugin notification (Helper Component)
  *
  * @license GPL 2 http://www.gnu.org/licenses/gpl-2.0.html
  */
-
-class helper_plugin_notification_cron extends DokuWiki_Plugin
+class helper_plugin_notification_cron extends Plugin
 {
     /** @var helper_plugin_sqlite */
     protected $sqlite;
@@ -33,11 +36,13 @@ class helper_plugin_notification_cron extends DokuWiki_Plugin
 
         $newUsers = array_diff($allUsers, $ourUsers);
 
-        if (!is_array($newUsers) || empty($newUsers)) return;
+        if (!is_array($newUsers) || $newUsers === []) return;
 
         foreach ($newUsers as $user) {
-            $this->sqlite->storeEntry('cron_check',
-                ['user' => $user, 'timestamp' => date('c', 0)]);
+            $this->sqlite->storeEntry(
+                'cron_check',
+                ['user' => $user, 'timestamp' => date('c', 0)]
+            );
         }
     }
 
@@ -50,14 +55,15 @@ class helper_plugin_notification_cron extends DokuWiki_Plugin
     public function getNotificationData($user)
     {
         $plugins = [];
-        $event = new Doku_Event('PLUGIN_NOTIFICATION_REGISTER_SOURCE', $plugins);
+        $event = new Event('PLUGIN_NOTIFICATION_REGISTER_SOURCE', $plugins);
         $event->trigger();
+
         $notifications_data = [
             'plugins' => $plugins,
             'user' => $user,
             'notifications' => []
         ];
-        $event = new Doku_Event('PLUGIN_NOTIFICATION_GATHER', $notifications_data);
+        $event = new Event('PLUGIN_NOTIFICATION_GATHER', $notifications_data);
         $event->trigger();
 
         if (!empty($notifications_data['notifications'])) {
@@ -126,7 +132,7 @@ class helper_plugin_notification_cron extends DokuWiki_Plugin
         $html .= '<ul>';
         $text = $this->getLang('mail content') . "\n\n";
 
-        usort($new_notifications, function($a, $b) {
+        usort($new_notifications, function ($a, $b) {
             if ($a['timestamp'] == $b['timestamp']) {
                 return 0;
             }
@@ -140,7 +146,7 @@ class helper_plugin_notification_cron extends DokuWiki_Plugin
             $date = strftime('%d.%m %H:%M', $timestamp);
 
             $html .= "<li class=\"level1\"><div class=\"li\">$date $content</div></li>";
-            $text .= $date . ' ' . strip_tags($content). "\n";
+            $text .= $date . ' ' . strip_tags($content) . "\n";
         }
         $html .= '</ul>';
 
@@ -162,7 +168,7 @@ class helper_plugin_notification_cron extends DokuWiki_Plugin
 
         $mail = new Mailer();
         $userinfo = $auth->getUserData($user, false);
-        $mail->to($userinfo['name'].' <'.$userinfo['mail'].'>');
+        $mail->to($userinfo['name'] . ' <' . $userinfo['mail'] . '>');
         $mail->subject($this->getLang('mail subject'));
         $mail->setBody($text, null, null, $html);
         return $mail->send();
@@ -183,8 +189,10 @@ class helper_plugin_notification_cron extends DokuWiki_Plugin
         foreach ($notifications as $notification) {
             $plugin = $notification['plugin'];
             $id = $notification['id'];
-            $sqlite->storeEntry('notification',
-                ['plugin' => $plugin, 'notification_id' => $id, 'user' => $user, 'sent' => date('c')]);
+            $sqlite->storeEntry(
+                'notification',
+                ['plugin' => $plugin, 'notification_id' => $id, 'user' => $user, 'sent' => date('c')]
+            );
         }
     }
 }
