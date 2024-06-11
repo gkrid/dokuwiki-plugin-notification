@@ -1,4 +1,8 @@
 <?php
+
+use dokuwiki\Extension\Event;
+use dokuwiki\Extension\SyntaxPlugin;
+
 /**
  * DokuWiki Plugin notification (Syntax Component)
  *
@@ -6,30 +10,30 @@
  * @author  Szymon Olewniczak <it@rid.pl>
  */
 
-// must be run within Dokuwiki
-if (!defined('DOKU_INC')) {
-    die();
-}
-
-class syntax_plugin_notification_list extends DokuWiki_Syntax_Plugin
+class syntax_plugin_notification_list extends SyntaxPlugin
 {
-    function getType() {
+    public function getType()
+    {
         return 'substition';
     }
 
-    function getSort() {
+    public function getSort()
+    {
         return 20;
     }
 
-    function PType() {
+    public function PType()
+    {
         return 'block';
     }
 
-    function connectTo($mode) {
-        $this->Lexer->addSpecialPattern('----+ *notification list *-+\n.*?----+', $mode,'plugin_notification_list');
+    public function connectTo($mode)
+    {
+        $this->Lexer->addSpecialPattern('----+ *notification list *-+\n.*?----+', $mode, 'plugin_notification_list');
     }
 
-    function handle($match, $state, $pos, Doku_Handler $handler){
+    public function handle($match, $state, $pos, Doku_Handler $handler)
+    {
         $lines = explode("\n", $match);
         array_shift($lines);
         array_pop($lines);
@@ -49,7 +53,7 @@ class syntax_plugin_notification_list extends DokuWiki_Syntax_Plugin
             $value = trim($pair[1]);
 
             if ($key == 'full') {
-                $value = $value == '0' ? false : true;
+                $value = $value != '0';
             }
 
             $params[$key] = $value;
@@ -73,7 +77,7 @@ class syntax_plugin_notification_list extends DokuWiki_Syntax_Plugin
             return false;
         }
 
-        $method = 'render'.ucfirst($mode);
+        $method = 'render' . ucfirst($mode);
         if (method_exists($this, $method)) {
             call_user_func([$this, $method], $renderer, $data);
             return true;
@@ -88,7 +92,7 @@ class syntax_plugin_notification_list extends DokuWiki_Syntax_Plugin
     protected function getNotificationPlugins($pattern)
     {
         $plugins = [];
-        trigger_event('PLUGIN_NOTIFICATION_REGISTER_SOURCE', $plugins);
+        Event::createAndTrigger('PLUGIN_NOTIFICATION_REGISTER_SOURCE', $plugins);
         $plugins = preg_grep('/' . $pattern . '/', $plugins);
 
         return $plugins;
@@ -137,7 +141,7 @@ class syntax_plugin_notification_list extends DokuWiki_Syntax_Plugin
             'user' => $data['user'],
             'notifications' => []
         ];
-        trigger_event('PLUGIN_NOTIFICATION_GATHER', $notifications_data);
+        Event::createAndTrigger('PLUGIN_NOTIFICATION_GATHER', $notifications_data);
 
         $notifications = $notifications_data['notifications'];
 
@@ -148,7 +152,7 @@ class syntax_plugin_notification_list extends DokuWiki_Syntax_Plugin
 
         $renderer->doc .= '<ul>';
 
-        usort($notifications, function($a, $b) {
+        usort($notifications, function ($a, $b) {
             if ($a['timestamp'] == $b['timestamp']) {
                 return 0;
             }
@@ -164,10 +168,8 @@ class syntax_plugin_notification_list extends DokuWiki_Syntax_Plugin
                 $date = strftime($data['date'], $timestamp);
             }
 
-//            $li .= p_render($mode, p_get_instructions($content), $info);
             $renderer->doc .= "<li class=\"level1\"><div class=\"li\">$date $content</div></li>";
         }
         $renderer->doc .= '</ul>';
     }
 }
-
