@@ -107,12 +107,11 @@ class syntax_plugin_notification_list extends SyntaxPlugin
     public function renderMetadata(Doku_Renderer $renderer, $data)
     {
         $plugin_name = $this->getPluginName();
-
+        if (!isset($renderer->meta['plugin'][$plugin_name])) {
+            $renderer->meta['plugin'][$plugin_name] = ['plugins' => []];
+        }
         $plugins = $this->getNotificationPlugins($data['plugin']);
         $old_plugins = $renderer->meta['plugin'][$plugin_name]['plugins'];
-        if (!$old_plugins) {
-            $old_plugins = [];
-        }
 
         $renderer->meta['plugin'][$plugin_name]['plugins'] = array_unique(array_merge($plugins, $old_plugins));
         if ($data['user'] == '$USER$') {
