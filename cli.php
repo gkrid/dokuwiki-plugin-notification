@@ -45,6 +45,7 @@ class cli_plugin_notification extends CLIPlugin
      */
     protected function main(Options $options)
     {
+        auth_setup(); // make sure ACLs are initialized
         $cmd = $options->getCmd();
         switch ($cmd) {
             case 'send':
