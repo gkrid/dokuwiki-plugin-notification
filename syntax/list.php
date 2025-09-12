@@ -132,6 +132,7 @@ class syntax_plugin_notification_list extends SyntaxPlugin
         $plugins = $this->getNotificationPlugins($data['plugin']);
 
         if ($data['user'] == '$USER$') {
+            if (!isset($INFO['userinfo'])) return;  // only works for login users
             $data['user'] = $INFO['client'];
         }
 
