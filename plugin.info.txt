@@ -1,7 +1,7 @@
 base   notification
 author Szymon Olewniczak
 email  dokuwiki@rid.pl
-date   2025-09-12
+date   2026-01-28
 name   notification plugin
 desc   Display notifications from other plugins to dokuwiki users.
 url    https://www.dokuwiki.org/plugin:notification
