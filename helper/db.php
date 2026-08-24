@@ -1,6 +1,7 @@
 <?php
 
 use dokuwiki\Extension\Plugin;
+use dokuwiki\plugin\sqlite\SQLiteDB;
 
 /**
  * DokuWiki Plugin notification (Helper Component)
@@ -46,7 +47,17 @@ class helper_plugin_notification_db extends Plugin
         $this->sqlite->getAdapter()->setUseNativeAlter(true);
 
         // initialize the database connection
-        if (!$this->sqlite->init('notification', DOKU_PLUGIN . 'notification/db/')) {
+        if (class_exists(SQLiteDB::class)) {
+            try {
+                new SQLiteDB('notification', DOKU_PLUGIN . 'notification/db/', $this->sqlite);
+            } catch (\Exception $exception) {
+                if (defined('DOKU_UNITTEST')) {
+                    throw new \Exception('Couldn\'t init sqlite.', 0, $exception);
+                }
+                msg('SQLite: ' . $exception->getMessage(), -1);
+                $this->sqlite = null;
+            }
+        } elseif (!$this->sqlite->init('notification', DOKU_PLUGIN . 'notification/db/')) {
             if (defined('DOKU_UNITTEST')) {
                 throw new \Exception('Couldn\'t init sqlite.');
             }
